@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 Certification Blockchain - DApp</title>
+    <title>🌸 Certification Blockchain ERC-721 - DApp</title>
     <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <!-- SheetJS (xlsx) pour lire Excel et CSV -->
@@ -22,7 +22,7 @@
             font-family: 'Quicksand', sans-serif;
             background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%);
             color: #4a044e;
-            max-width: 920px;
+            max-width: 960px;
             margin: 30px auto;
             padding: 20px;
             min-height: 100vh;
@@ -95,6 +95,7 @@
             display: none;
             font-weight: 600;
             word-break: break-all;
+            line-height: 1.6;
         }
         .success {
             background: #fdf2f8;
@@ -130,31 +131,45 @@
         }
         .hash-box {
             display: inline-block;
-            background: rgba(168, 85, 247, 0.1);
-            padding: 4px 8px;
+            background: rgba(168, 85, 247, 0.12);
+            padding: 5px 10px;
             border-radius: 8px;
             font-size: 12px;
             margin-top: 6px;
             color: var(--purple-dark);
         }
+        .contract-input-row {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h1>🌸 Système de Certification Blockchain</h1>
-            <p id="walletStatus" style="margin: 0; color: #86198f; font-weight: 600;">Non connecté à MetaMask</p>
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <div>
+                <h1>🌸 Certification Blockchain ERC-721</h1>
+                <p id="walletStatus" style="margin: 0; color: #86198f; font-weight: 600;">Non connecté à MetaMask</p>
+            </div>
+            <button id="connectBtn" onclick="connectWallet()">🦊 Connecter MetaMask</button>
         </div>
-        <button id="connectBtn" onclick="connectWallet()">🦊 Connecter MetaMask</button>
+        <div class="contract-input-row">
+            <input type="text" id="contractAddressInput" value="0x5FbDB2315678afecb367f032d93F642f64180aa3" placeholder="Adresse du contrat ERC-721 (0x...)" style="margin-bottom: 0;">
+            <button onclick="updateContractAddress()">Mettre à jour Contrat</button>
+        </div>
     </div>
 
-    <!-- Section 1: Import Excel (Batch Mint) -->
+    <!-- Section 1: Import Excel / CSV (Batch Mint ERC-721) -->
     <div class="card">
-        <h2>✨ Importation en Lot (Excel / CSV)</h2>
-        <p style="font-size: 14px; color: #86198f;">Colonnes requises : <b>recipient, studentName, studentId, diplomaTitle, issueDate, grade</b></p>
+        <h2>✨ Importation en Lot (Excel / CSV - ERC-721)</h2>
+        <p style="font-size: 14px; color: #86198f;">
+            Colonnes requises : <b>recipient, studentId, studentName, diplomaTitle, tokenURI</b>
+        </p>
         <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" onchange="handleExcel(event)" />
-        
+
         <div id="previewArea" style="display:none;">
             <table id="previewTable">
                 <thead>
@@ -163,41 +178,39 @@
                             <input type="checkbox" id="selectAll" checked onchange="toggleAllCheckboxes(this)">
                         </th>
                         <th>Adresse Wallet</th>
-                        <th>Nom Étudiant</th>
                         <th>ID Étudiant</th>
+                        <th>Nom Étudiant</th>
                         <th>Diplôme</th>
-                        <th>Date</th>
-                        <th>Mention</th>
+                        <th>Token URI</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
             <br>
-            <button onclick="mintBatchFromExcel()">💜 Émettre les certificats sélectionnés</button>
+            <button onclick="mintBatchFromExcel()">💜 Émettre les certificats (Batch ERC-721)</button>
         </div>
         <div id="batchStatus" class="status"></div>
     </div>
 
-    <!-- Section 2: Ajout Unitaire -->
+    <!-- Section 2: Ajout Unitaire (Mint ERC-721) -->
     <div class="card">
-        <h2>🎀 Émettre un Certificat Individuel</h2>
+        <h2>🎀 Émettre un Certificat NFT (ERC-721)</h2>
         <div class="grid">
             <input type="text" id="recipient" placeholder="Adresse Wallet Étudiant (0x...)">
+            <input type="text" id="studentId" placeholder="Code Étudiant unique (ex: STD-2026-001)">
             <input type="text" id="studentName" placeholder="Nom complet de l'étudiant">
-            <input type="text" id="studentId" placeholder="Code Étudiant (ex: CNE12345)">
-            <input type="text" id="diplomaTitle" placeholder="Intitulé du Diplôme">
-            <input type="text" id="issueDate" placeholder="Date d'obtention (ex: 2026-06-30)">
-            <input type="text" id="grade" placeholder="Mention (ex: Très Bien)">
+            <input type="text" id="diplomaTitle" placeholder="Intitulé du Diplôme (ex: Master IDIA)">
+            <input type="text" id="tokenURI" placeholder="Token URI / IPFS (ex: ipfs://Qm.../cert1.json)" style="grid-column: span 2;">
         </div>
-        <button onclick="mintSingle()">💖 Émettre le Certificat</button>
+        <button onclick="mintSingle()">💖 Émettre le Certificat (NFT)</button>
         <div id="mintStatus" class="status"></div>
     </div>
 
-    <!-- Section 3: Vérification et Révocation -->
+    <!-- Section 3: Vérification et Révocation par Token ID -->
     <div class="card">
-        <h2>🔍 Zone Publique : Vérifier / Révoquer</h2>
-        <div style="display: flex; gap: 10px;">
-            <input type="number" id="searchId" placeholder="ID du Certificat (ex: 1)" style="margin:0;">
+        <h2>🔍 Zone Publique : Vérifier / Révoquer (par Token ID)</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="number" id="searchTokenId" placeholder="Token ID (ex: 1)" min="1" style="margin:0; flex: 1; min-width: 180px;">
             <button onclick="verifyCert()">Vérifier</button>
             <button class="danger" onclick="revokeCert()">Révoquer</button>
         </div>
@@ -205,18 +218,57 @@
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
+        let CONTRACT_ADDRESS = document.getElementById("contractAddressInput").value.trim();
 
         const CONTRACT_ABI = [
-            "function mintCertificate(address to, string studentName, string studentId, string diplomaTitle, string issueDate, string grade) external returns (uint256)",
-            "function batchMint(address[] recipients, string[] studentNames, string[] studentIds, string[] diplomaTitles, string[] issueDates, string[] grades) external",
-            "function getCertificate(uint256 certId) external view returns (tuple(string studentName, string studentId, string diplomaTitle, string issueDate, string grade, address recipient, bool revoked))",
-            "function revoke(uint256 certId) external",
-            "event CertificateMinted(uint256 indexed certId, string studentId, address recipient)"
+            "function mintCertificate(address to, string calldata studentId, string calldata studentName, string calldata diplomaTitle, string calldata uri) external returns (uint256)",
+            "function batchMintCertificates(address[] calldata to, string[] calldata studentIds, string[] calldata studentNames, string[] calldata diplomaTitles, string[] calldata uris) external",
+            "function revokeCertificate(uint256 tokenId) external",
+            "function getCertificate(uint256 tokenId) external view returns (string memory studentId, string memory studentName, string memory diplomaTitle, uint256 issuedAt, bool revoked, string memory uri)",
+            "function ownerOf(uint256 tokenId) external view returns (address)",
+            "event CertificateMinted(uint256 indexed tokenId, address indexed recipient, string studentId, string tokenURI)",
+            "event CertificateRevoked(uint256 indexed tokenId, address indexed revokedBy)"
         ];
 
         let provider, signer, contract;
         let parsedExcelData = [];
+
+        function formatRoleOrContractError(err) {
+            const raw = (err?.shortMessage || err?.reason || err?.message || "").toLowerCase();
+
+            if (raw.includes("accesscontrolunauthorizedaccount") || raw.includes("missing role")) {
+                return "🚫 Accès refusé : votre compte n'a pas le rôle requis (MINTER_ROLE pour émettre, DEFAULT_ADMIN_ROLE pour révoquer).";
+            }
+            if (raw.includes("student id already minted")) {
+                return "⚠️ Ce studentId a déjà un certificat émis (double mint bloqué).";
+            }
+            if (raw.includes("certificate does not exist") || raw.includes("nonexistent token") || raw.includes("erc721nonexistenttoken")) {
+                return "❌ Certificat (Token ID) introuvable sur la blockchain.";
+            }
+            if (raw.includes("already revoked")) {
+                return "⚠️ Ce certificat est déjà révoqué.";
+            }
+            if (raw.includes("user rejected")) {
+                return "ℹ️ Transaction annulée dans MetaMask.";
+            }
+            return "❌ Erreur : " + (err?.reason || err?.shortMessage || err?.message || "Erreur inconnue");
+        }
+
+        async function initContract() {
+            if (!provider || !signer) return;
+            CONTRACT_ADDRESS = document.getElementById("contractAddressInput").value.trim();
+            contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        }
+
+        async function updateContractAddress() {
+            CONTRACT_ADDRESS = document.getElementById("contractAddressInput").value.trim();
+            if (signer) {
+                await initContract();
+                alert("Adresse du contrat mise à jour : " + CONTRACT_ADDRESS);
+            } else {
+                alert("Adresse enregistrée. Connectez MetaMask pour interagir.");
+            }
+        }
 
         async function connectWallet() {
             if (!window.ethereum) {
@@ -225,9 +277,10 @@
             }
             try {
                 provider = new ethers.BrowserProvider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
                 signer = await provider.getSigner();
                 const address = await signer.getAddress();
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                await initContract();
 
                 document.getElementById("walletStatus").innerText = "✨ Connecté : " + address;
                 document.getElementById("connectBtn").innerText = "💜 Connecté";
@@ -237,14 +290,13 @@
             }
         }
 
-       function handleExcel(e) {
+        function handleExcel(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(event) {
                 const data = new Uint8Array(event.target.result);
-                // raw: true kat-khlli les adresses 0x... w les dates bhal texte bla ma y-t7wlo l arqam!
                 const workbook = XLSX.read(data, { type: 'array', raw: true, codepage: 65001 });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                 parsedExcelData = XLSX.utils.sheet_to_json(firstSheet, { raw: false });
@@ -253,16 +305,16 @@
                 tbody.innerHTML = "";
 
                 parsedExcelData.forEach((row, index) => {
+                    const uriVal = row.tokenURI || row.uri || `ipfs://metadata/${row.studentId || index + 1}.json`;
                     const tr = `<tr>
                         <td style="text-align: center;">
                             <input type="checkbox" class="row-checkbox" data-index="${index}" checked>
                         </td>
                         <td>${row.recipient || ''}</td>
-                        <td>${row.studentName || ''}</td>
                         <td>${row.studentId || ''}</td>
+                        <td>${row.studentName || ''}</td>
                         <td>${row.diplomaTitle || ''}</td>
-                        <td>${row.issueDate || ''}</td>
-                        <td>${row.grade || ''}</td>
+                        <td>${uriVal}</td>
                     </tr>`;
                     tbody.innerHTML += tr;
                 });
@@ -279,33 +331,54 @@
 
         async function mintBatchFromExcel() {
             if (!contract) return alert("Connectez d'abord MetaMask !");
-            
+
             const selectedIndices = Array.from(document.querySelectorAll('.row-checkbox:checked'))
-                                         .map(cb => parseInt(cb.getAttribute('data-index')));
-            
+                .map(cb => parseInt(cb.getAttribute('data-index')));
+
             if (selectedIndices.length === 0) return alert("Veuillez sélectionner au moins une ligne !");
 
             const selectedRows = selectedIndices.map(i => parsedExcelData[i]);
             const statusDiv = document.getElementById("batchStatus");
             statusDiv.className = "status success";
-            statusDiv.innerText = "⏳ Transaction en cours... Confirmez dans MetaMask.";
+            statusDiv.innerText = "⏳ Transaction batch en cours... Confirmez dans MetaMask.";
 
             try {
-                const recipients = selectedRows.map(r => String(r.recipient).trim());
-                const names = selectedRows.map(r => String(r.studentName));
-                const ids = selectedRows.map(r => String(r.studentId));
-                const titles = selectedRows.map(r => String(r.diplomaTitle));
-                const dates = selectedRows.map(r => String(r.issueDate));
-                const grades = selectedRows.map(r => String(r.grade));
+                const recipients = selectedRows.map(r => String(r.recipient || "").trim());
+                const studentIds = selectedRows.map(r => String(r.studentId || "").trim());
+                const studentNames = selectedRows.map(r => String(r.studentName || "").trim());
+                const diplomaTitles = selectedRows.map(r => String(r.diplomaTitle || "").trim());
+                const uris = selectedRows.map((r, idx) =>
+                    String(r.tokenURI || r.uri || `ipfs://metadata/${studentIds[idx] || idx + 1}.json`).trim()
+                );
 
-                const tx = await contract.batchMint(recipients, names, ids, titles, dates, grades);
-                await tx.wait();
+                const tx = await contract.batchMintCertificates(
+                    recipients,
+                    studentIds,
+                    studentNames,
+                    diplomaTitles,
+                    uris
+                );
+                const receipt = await tx.wait();
 
-                statusDiv.innerHTML = `💖 Succès ! ${recipients.length} certificats enregistrés.<br><span class="hash-box">🔗 Tx Hash : ${tx.hash}</span>`;
+                const mintedItems = [];
+                for (const log of receipt.logs) {
+                    try {
+                        const parsed = contract.interface.parseLog(log);
+                        if (parsed && parsed.name === "CertificateMinted") {
+                            mintedItems.push(`Token #${parsed.args.tokenId.toString()} (${parsed.args.studentId}) → URI: ${parsed.args.tokenURI}`);
+                        }
+                    } catch (_) {}
+                }
+
+                statusDiv.innerHTML = `
+                    💖 Succès ! ${recipients.length} certificats NFT émis.<br>
+                    ${mintedItems.length ? "<b>NFTs créés :</b><br>" + mintedItems.join("<br>") + "<br>" : ""}
+                    <span class="hash-box">🔗 Tx Hash : ${tx.hash}</span>
+                `;
             } catch (err) {
                 console.error(err);
                 statusDiv.className = "status error";
-                statusDiv.innerText = "❌ Erreur : " + (err.reason || err.message);
+                statusDiv.innerText = formatRoleOrContractError(err);
             }
         }
 
@@ -316,57 +389,86 @@
             statusDiv.innerText = "⏳ Transaction en cours...";
 
             try {
-                const tx = await contract.mintCertificate(
-                    document.getElementById("recipient").value.trim(),
-                    document.getElementById("studentName").value,
-                    document.getElementById("studentId").value,
-                    document.getElementById("diplomaTitle").value,
-                    document.getElementById("issueDate").value,
-                    document.getElementById("grade").value
-                );
-                await tx.wait();
-                statusDiv.innerHTML = `💖 Certificat émis avec succès !<br><span class="hash-box">🔗 Tx Hash : ${tx.hash}</span>`;
+                const to = document.getElementById("recipient").value.trim();
+                const studentId = document.getElementById("studentId").value.trim();
+                const studentName = document.getElementById("studentName").value.trim();
+                const diplomaTitle = document.getElementById("diplomaTitle").value.trim();
+                const uri = document.getElementById("tokenURI").value.trim();
+
+                const tx = await contract.mintCertificate(to, studentId, studentName, diplomaTitle, uri);
+                const receipt = await tx.wait();
+
+                let mintedTokenId = "N/A";
+                let mintedUri = uri;
+
+                for (const log of receipt.logs) {
+                    try {
+                        const parsed = contract.interface.parseLog(log);
+                        if (parsed && parsed.name === "CertificateMinted") {
+                            mintedTokenId = parsed.args.tokenId.toString();
+                            mintedUri = parsed.args.tokenURI;
+                            break;
+                        }
+                    } catch (_) {}
+                }
+
+                statusDiv.innerHTML = `
+                    💖 Certificat NFT émis avec succès !<br>
+                    <b>Token ID :</b> #${mintedTokenId}<br>
+                    <b>Token URI :</b> ${mintedUri}<br>
+                    <span class="hash-box">🔗 Tx Hash : ${tx.hash}</span>
+                `;
             } catch (err) {
                 console.error(err);
                 statusDiv.className = "status error";
-                statusDiv.innerText = "❌ Erreur : " + (err.reason || err.message);
+                statusDiv.innerText = formatRoleOrContractError(err);
             }
         }
 
         async function verifyCert() {
             if (!contract) return alert("Connectez d'abord MetaMask !");
-            const id = document.getElementById("searchId").value;
+            const tokenId = document.getElementById("searchTokenId").value;
             const resDiv = document.getElementById("verifyResult");
 
             try {
-                const cert = await contract.getCertificate(id);
+                const cert = await contract.getCertificate(tokenId);
+                const owner = await contract.ownerOf(tokenId);
+                const issuedDate = new Date(Number(cert.issuedAt) * 1000).toLocaleString("fr-FR");
+
                 resDiv.className = cert.revoked ? "status error" : "status success";
                 resDiv.innerHTML = `
                     <b>Statut :</b> ${cert.revoked ? "🚫 RÉVOQUÉ" : "🌸 VALIDE"}<br>
+                    <b>Token ID :</b> #${tokenId}<br>
                     <b>Étudiant :</b> ${cert.studentName} (ID: ${cert.studentId})<br>
-                    <b>Diplôme :</b> ${cert.diplomaTitle} — <b>Mention :</b> ${cert.grade}<br>
-                    <b>Date :</b> ${cert.issueDate}<br>
-                    <b>Wallet :</b> ${cert.recipient}
+                    <b>Diplôme :</b> ${cert.diplomaTitle}<br>
+                    <b>Date d'émission :</b> ${issuedDate}<br>
+                    <b>Propriétaire actuel (NFT) :</b> ${owner}<br>
+                    <b>Token URI :</b> ${cert.uri}
                 `;
             } catch (err) {
+                console.error(err);
                 resDiv.className = "status error";
-                resDiv.innerText = "❌ Certificat introuvable.";
+                resDiv.innerText = formatRoleOrContractError(err);
             }
         }
 
         async function revokeCert() {
             if (!contract) return alert("Connectez d'abord MetaMask !");
-            const id = document.getElementById("searchId").value;
+            const tokenId = document.getElementById("searchTokenId").value;
             const resDiv = document.getElementById("verifyResult");
 
             try {
-                const tx = await contract.revoke(id);
+                const tx = await contract.revokeCertificate(tokenId);
                 await tx.wait();
                 resDiv.className = "status error";
-                resDiv.innerHTML = `🚫 Le certificat #${id} a été révoqué.<br><span class="hash-box">🔗 Tx Hash : ${tx.hash}</span>`;
+                resDiv.innerHTML = `
+                    🚫 Le certificat Token #${tokenId} a été révoqué.<br>
+                    <span class="hash-box">🔗 Tx Hash : ${tx.hash}</span>
+                `;
             } catch (err) {
+                console.error(err);
                 resDiv.className = "status error";
-                resDiv.innerText = "❌ Erreur : " + (err.reason || err.message);
+                resDiv.innerText = formatRoleOrContractError(err);
             }
         }
     </script>

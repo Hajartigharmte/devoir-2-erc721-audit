@@ -1,50 +1,29 @@
-# 🎓 Projet de Certification Blockchain (DApp)
+# Devoir 2 — Certification Académique ERC-721 & Audit de Sécurité
 
-Projet académique de fin d'études permettant d'émettre, de vérifier et de révoquer des certificats académiques sur la blockchain Ethereum de manière sécurisée et traçable.
+Projet réalisé dans le cadre du **Devoir 2**, étendant le registre de certificats vers le standard **ERC-721** (`ERC721URIStorage`) avec contrôle d'accès (`AccessControl`), protection contre la réentrance (`ReentrancyGuard`), tests de sécurité et rapport d'audit simplifié.
 
-## 🛠️ Technologies Utilisées
-- **Smart Contract :** Solidity, Hardhat
-- **Frontend :** HTML5, CSS3 (Design Pastel Rose/Mauve), JavaScript
-- **Web3 & Bibliothèques :** Ethers.js v6, SheetJS (XLSX) pour l'importation Excel/CSV
-- **Environnement de test :** Hardhat Local Network
+## Structure du projet
+- `contracts/CertificateRegistryERC721.sol` : contrat principal ERC-721 (émission unitaire, émission par lot, révocation, consultation, unicité et rôles).
+- `scripts/deploy.js` : script de déploiement (syntaxe ESM).
+- `test/CertificateRegistryERC721.test.js` : tests unitaires et de sécurité Hardhat.
+- `frontend/index.html` : interface web d'interaction avec le contrat.
+- `AUDIT_REPORT.md` : rapport d'audit simplifié.
 
----
+## Commandes utiles
 
-## 📂 Structure du Projet
-```text
-📦 Devoir-Certificat/
-├── artifacts/                  # Fichiers de compilation du contrat
-├── cache/                      # Cache Hardhat
-├── contracts/
-│   └── CertificateRegistry.sol # Contrat intelligent (gestion admin et certificats)
-├── frontend/
-│   └── index.html              # Interface utilisateur DApp (Web3, Rose & Mauve)
-├── node_modules/               # Dépendances Node.js
-├── scripts/
-│   └── deploy.js               # Script de déploiement Hardhat
-├── test/
-│   └── CertificateRegistry.test.js # Tests unitaires Hardhat (5 tests validés)
-├── capture_import_excel.jpeg   # Capture d'écran de l'importation en lot réussie
-├── Capture-mint-reussi.jpeg    # Capture d'écran du mint individuel & vérification
-├── exemple_etudiants.csv       # Fichier CSV d'exemple pour le batch mint
-├── hardhat.config.js           # Configuration Hardhat
-├── package.json                # Configuration et dépendances npm
-├── package-lock.json           # Arborescence exacte des packages
-└── README.md                   # Documentation du projet
+### 1. Compilation et tests unitaires
+npx hardhat compile
+npx hardhat test
 
-⚙️ Guide d'Installation et Exécution
-Installer les dépendances : npm install
+### 2. Déploiement en local
+Dans un premier terminal :
+npx hardhat node
 
-Lancer le nœud local Hardhat : npx hardhat node
+Dans un second terminal :
+npx hardhat run scripts/deploy.js --network localhost
 
-Déployer le Smart Contract (dans un second terminal) : npx hardhat run scripts/deploy.js --network localhost
+### 3. Lancer l'interface web
+Ouvrir `frontend/index.html` via un serveur local (ex. Live Server sur `127.0.0.1:5500/frontend/index.html`)[cite: 4], vérifier l'adresse du contrat déployé, puis connecter MetaMask sur le réseau local (`127.0.0.1:8545`).
 
-Lancer les tests unitaires : npx hardhat test
-
-Lancer l'interface Web : Ouvrir le fichier frontend/index.html via Live Server et connecter MetaMask au réseau local (Chain ID: 31337).
-
-📌 Informations Clés du Déploiement
-Adresse du Contrat : 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
-
-Adresse Admin (Constructeur) : 0x4f848c26204Eb3Ecbabe556a3A645F1f7a7e41fA
-
+## Sécurité et audit
+Voir le fichier **`AUDIT_REPORT.md`** pour le périmètre audité, la checklist (`OK` / `À compléter`), les vérifications de sécurité, les résultats des tests et les pistes d'amélioration.
